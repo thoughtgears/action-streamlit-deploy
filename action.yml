@@ -49,6 +49,7 @@ runs:
             per_page: '1'
           });
           console.log(resp.data.workflow_runs[0].id);
+          core.exportVariable('run_id', resp.data.workflow_runs[0].id);
 
     - name: Download Terraform State Artifact
       id: download-artifact
