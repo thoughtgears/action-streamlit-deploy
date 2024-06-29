@@ -34,13 +34,16 @@ runs:
 
     - name: Get Last Successful Run
       id: get-last-run
-      uses: actions/github-script@v5
+      uses: actions/github-script@v7
       with:
         script: |
-          const workflowRef = github.context.workflow_ref
-          const repository = github.context.repository
-          const workflowId = workflowRef.split('/').slice(-1)[0].split('@')[0];
-          console.log(`Workflow ID: ${workflowId}`);
+          const workflow = context.workflow;
+          const repository = context.repo.repo;
+          const owner = context.repo.owner;
+          #          const workflowId = workflowRef.split('/').slice(-1)[0].split('@')[0];
+          console.log(`Workflow ID: ${workflow}`);
+          console.log(`Repository: ${repository}`);
+          console.log(`Owner: ${owner}`);
 
     - name: Download Terraform State Artifact
       id: download-artifact
