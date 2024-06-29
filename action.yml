@@ -39,15 +39,11 @@ runs:
         script: |
           const path = require('path');
           const workflow = context.workflow;
-          const repo = context.repo.repo;
-          const owner = context.repo.owner;
-
           const workflow_id = path.basename(workflow);
-          const repository = owner + '/' + repo;
           
           const resp = await github.rest.actions.listWorkflowRuns({
-            owner,
-            repository,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
             workflow_id: workflow,
             status: 'success',
             per_page: 1
