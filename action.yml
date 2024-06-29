@@ -39,13 +39,12 @@ runs:
         script: |
           const path = require('path');
           const workflow = context.workflow;
-          const repository = context.repo.repo;
+          const repo = context.repo.repo;
           const owner = context.repo.owner;
-          console.log(`Workflow ID: ${workflow}`);
-          console.log(`Repository: ${repository}`);
-          console.log(`Owner: ${owner}`);
+
           const workflow_id = path.basename(workflow);
-          console.log(`Workflow ID: ${workflow_id}`);
+          const repository = owner + '/' + repo;
+          
           const resp = await github.rest.actions.listWorkflowRuns({
             owner,
             repository,
