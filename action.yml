@@ -32,15 +32,6 @@ runs:
       with:
         terraform_version: ${{ inputs.terraform_version }}
 
-    - name: Generate Configuration
-      id: generate-config
-      working-directory: ${{ inputs.terraform_directory }}
-      run: |
-        touch run.auto.tfvars
-        echo "region     = ${{ inputs.region }}" >> run.auto.tfvars
-        echo "project_id = ${{ inputs.project }}" >> run.auto.tfvars
-      shell: bash
-
     - name: Download Terraform State Artifact
       id: download-artifact
       uses: actions/download-artifact@v4
@@ -66,4 +57,4 @@ runs:
       with:
         name: terraform.tfstate
         path: ${{ inputs.terraform_directory }}/terraform.tfstate
-        github_token: ${{ inputs.github_token }}
+        github-token: ${{ inputs.github_token }}
