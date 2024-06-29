@@ -1,0 +1,26 @@
+name: Test workflow on PUSH
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'examples/test/**'
+      - '.github/workflows/test.yml'
+      - 'action.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Test Composite Action
+        uses: ./
+        with:
+          terraform_version: 1.8.2
+          region: europe-west1
+          project: test-project-21390
+          terraform_directory: examples/test
