@@ -40,7 +40,6 @@ runs:
           const workflow = context.workflow;
           const repository = context.repo.repo;
           const owner = context.repo.owner;
-          #          const workflowId = workflowRef.split('/').slice(-1)[0].split('@')[0];
           console.log(`Workflow ID: ${workflow}`);
           console.log(`Repository: ${repository}`);
           console.log(`Owner: ${owner}`);
