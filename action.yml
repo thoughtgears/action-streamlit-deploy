@@ -1,7 +1,7 @@
 name: Streamlit Deploy
 description: Deploy streamlit to Cloud Run
 inputs:
-  terraform_version:
+  terraform-version:
     description: The version of Terraform to use
     default: 1.8.5
   terraform_directory:
@@ -13,7 +13,7 @@ inputs:
   project:
     description: GCP Project to deploy to
     required: true
-  github_token:
+  github-token:
     description: Token to use for downloading and uploading the Terraform state
     required: true
 
@@ -32,16 +32,6 @@ runs:
       with:
         terraform_version: ${{ inputs.terraform_version }}
 
-    - name: Set up Python
-      id: setup-python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
-
-    - run: pip install python-gnupg requests
-      id: install-requirements
-      shell: bash
-
     - name: Generate Configuration
       id: generate-config
       run: |
@@ -53,10 +43,11 @@ runs:
     - name: Download Terraform State Artifact
       id: download-artifact
       uses: actions/download-artifact@v4
+      continue-on-error: true
       with:
         name: terraform.tfstate
         path: ${{ inputs.terraform_directory }}/terraform.tfstate
-        github_token: ${{ inputs.github_token }}
+        github-token: ${{ inputs.github_token }}
 
     - name: Terraform Init
       id: terraform-init
