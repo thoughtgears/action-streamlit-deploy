@@ -36,21 +36,18 @@ runs:
       id: get-last-run
       shell: bash
       run: |
-        workflow_id=$(echo "${{ github.workflow_ref }}" | sed 's/@.*//' | awk -F'/' '{print $NF}')
-        echo "workflow_id=$workflow_id" >> $GITHUB_ENV
         response=$(curl -s -H "Authorization: token ${{ inputs.github_token }}" \
                          -H "Accept: application/vnd.github.v3+json" \
-                         "https://api.github.com/repos/${{ github.repository }}/actions/workflows/${{ env.workflow_id }}/runs?status=success&per_page=1")
+                         "https://api.github.com/repos/${{ github.repository }}/actions/workflows/$(echo "${{ github.workflow_ref }}" | sed 's/@.*//' | awk -F'/' '{print $NF}')/runs?status=success&per_page=1")
         
         run_id=$(echo "$response" | jq -r '.workflow_runs[0].id')
         
         if [ "$run_id" == "null" ]; then
-          echo "No successful runs found for workflow: ${{ env.workflow_id }}"
+          echo "No successful runs found for workflow: $(echo "${{ github.workflow_ref }}" | sed 's/@.*//' | awk -F'/' '{print $NF}')"
           exit 1
         fi
         
         echo "run_id=$run_id" >> $GITHUB_ENV
-
 
     - name: Download Terraform State Artifact
       id: download-artifact
