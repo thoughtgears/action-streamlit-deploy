@@ -16,6 +16,9 @@ inputs:
   github_token:
     description: GitHub token to use in the action for different steps
     required: true
+  streamlit_name:
+    description: The name of the streamlit app
+    required: true
 
 outputs:
   cloud_run_url:
@@ -64,7 +67,7 @@ runs:
       run: |
         terraform init
         terraform validate
-        terraform plan -out=tf.plan --var region=${{ inputs.region }} --var project_id=${{ inputs.project }}
+        terraform plan -out=tf.plan --var region=${{ inputs.region }} --var project_id=${{ inputs.project }} -var streamlit_name=${{ inputs.streamlit_name }}
         terraform apply tf.plan
       working-directory: ${{ inputs.terraform_directory }}
 
