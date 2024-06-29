@@ -46,9 +46,9 @@ runs:
             repo: context.repo.repo,
             workflow_id: workflow,
             status: 'success',
-            per_page: 1
+            per_page: '1'
           });
-          console.log(resp);
+          console.log(resp.data.workflow_runs[0].id);
 
     - name: Download Terraform State Artifact
       id: download-artifact
