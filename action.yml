@@ -50,22 +50,14 @@ runs:
         path: ${{ inputs.terraform_directory }}/terraform.tfstate
         github-token: ${{ inputs.github_token }}
 
-    - name: Terraform Init
-      id: terraform-init
+    - name: Terraform Run
+      id: terraform-run
       shell: bash
-      run: terraform init
-      working-directory: ${{ inputs.terraform_directory }}
-
-    - name: Terraform Plan
-      id: terraform-plan
-      shell: bash
-      run: terraform plan -out=tf.plan
-      working-directory: ${{ inputs.terraform_directory }}
-
-    - name: Terraform Apply
-      id: terraform-apply
-      shell: bash
-      run: terraform apply tf.plan
+      run: |
+        terraform init
+        terraform validate
+        terraform plan -out=tf.plan --var region=${{ inputs.region }} --var project_id=${{ inputs.project }}
+        terraform apply tf.plan
       working-directory: ${{ inputs.terraform_directory }}
 
     - name: Upload Terraform State Artifact
