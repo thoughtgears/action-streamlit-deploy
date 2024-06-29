@@ -13,6 +13,9 @@ inputs:
   project:
     description: GCP Project to deploy to
     required: true
+  github_token:
+    description: GitHub token to use in the action for different steps
+    required: true
 
 outputs:
   cloud_run_url:
@@ -29,6 +32,24 @@ runs:
       with:
         terraform_version: ${{ inputs.terraform_version }}
 
+    - name: Get Last Successful Run
+      id: get-last-run
+      shell: bash
+      run: |
+        response=$(curl -s -H "Authorization: token ${{ inputs.github_token }}" \
+                         -H "Accept: application/vnd.github.v3+json" \
+                         "https://api.github.com/repos/${{ github.repository }}/actions/workflows/$WORKFLOW_NAME/runs?status=success&per_page=1")
+        
+        run_id=$(echo "$response" | jq -r '.workflow_runs[0].id')
+        
+        if [ "$run_id" == "null" ]; then
+          echo "No successful runs found for workflow: $WORKFLOW_NAME"
+          exit 1
+        fi
+        
+        echo "run_id=$run_id" >> $GITHUB_ENV
+
+
     - name: Download Terraform State Artifact
       id: download-artifact
       uses: actions/download-artifact@v4
@@ -36,6 +57,7 @@ runs:
       with:
         name: terraform.tfstate
         path: ${{ inputs.terraform_directory }}
+        run-id: ${{ env.run_id }}
 
     - name: Terraform Run
       id: terraform-run
@@ -54,4 +76,3 @@ runs:
         name: terraform.tfstate
         path: ${{ inputs.terraform_directory }}/terraform.tfstate
         retention-days: 90
-        github-token: ${{ inputs.github_token }}
