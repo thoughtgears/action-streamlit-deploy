@@ -45,7 +45,7 @@ runs:
           console.log(`Repository: ${repository}`);
           console.log(`Owner: ${owner}`);
           const workflow_id = path.basename(workflow);
-          const resp = octokit.rest.actions.listWorkflowRuns({
+          const resp = github.rest.actions.listWorkflowRuns({
             owner,
             repo,
             workflow_id: workflow,
