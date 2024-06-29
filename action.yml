@@ -47,7 +47,7 @@ runs:
           const workflow_id = path.basename(workflow);
           const resp = github.rest.actions.listWorkflowRuns({
             owner,
-            repo,
+            repository,
             workflow_id: workflow,
             status: 'success',
             per_page: 1
