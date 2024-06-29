@@ -48,7 +48,6 @@ runs:
             status: 'success',
             per_page: '1'
           });
-          console.log(resp.data.workflow_runs[0].id);
           core.exportVariable('run_id', resp.data.workflow_runs[0].id);
 
     - name: Download Terraform State Artifact
@@ -56,7 +55,6 @@ runs:
       uses: actions/download-artifact@v4
       continue-on-error: true
       with:
-        name: terraform.tfstate
         path: ${{ inputs.terraform_directory }}
         run-id: ${{ env.run_id }}
 
