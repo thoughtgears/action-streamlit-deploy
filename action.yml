@@ -45,7 +45,8 @@ runs:
           console.log(`Repository: ${repository}`);
           console.log(`Owner: ${owner}`);
           const workflow_id = path.basename(workflow);
-          const resp = github.rest.actions.listWorkflowRuns({
+          console.log(`Workflow ID: ${workflow_id}`);
+          const resp = await github.rest.actions.listWorkflowRuns({
             owner,
             repository,
             workflow_id: workflow,
