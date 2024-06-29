@@ -34,6 +34,7 @@ runs:
 
     - name: Generate Configuration
       id: generate-config
+      working-directory: ${{ inputs.terraform_directory }}
       run: |
         touch run.auto.tfvars
         echo "region     = ${{ inputs.region }}" >> run.auto.tfvars
