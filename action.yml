@@ -19,6 +19,9 @@ inputs:
   streamlit_name:
     description: The name of the streamlit app
     required: true
+  gcs_state_bucket:
+    description: The name of the GCS bucket to store the Terraform state
+    default: ""
 
 outputs:
   cloud_run_url:
@@ -35,7 +38,27 @@ runs:
       with:
         terraform_version: ${{ inputs.terraform_version }}
 
+    - name: Create Terraform backend config
+      id: create-backend-config
+      uses: actions/github-script@v5
+      with:
+        script: |
+          const fs = require('fs');
+          const path = 'terraform/backend.tf';
+          const content = `
+          terraform {
+            backend "gcs" {
+              bucket = ${inputs.gcs_state_bucket}
+              prefix =  "${inputs.streamlit_name}"
+            }
+          }`;
+
+          fs.mkdirSync('terraform', { recursive: true });
+          fs.writeFileSync(path, content.trim());
+          console.log(`Created ${path} with content:\n${content}`);
+
     - name: Get Last Successful Run
+      if: ${{ inputs.gcs_state_bucket == '' }}
       id: get-last-run
       uses: actions/github-script@v7
       with:
@@ -54,6 +77,7 @@ runs:
           core.exportVariable('run_id', resp.data.workflow_runs[0].id);
 
     - name: Download Terraform State Artifact
+      if: ${{ inputs.gcs_state_bucket == '' }}
       id: download-artifact
       uses: actions/download-artifact@v4
       continue-on-error: true
@@ -72,6 +96,7 @@ runs:
       working-directory: ${{ inputs.terraform_directory }}
 
     - name: Upload Terraform State Artifact
+      if: ${{ inputs.gcs_state_bucket == '' }}
       id: upload-artifact
       uses: actions/upload-artifact@v4
       with:
