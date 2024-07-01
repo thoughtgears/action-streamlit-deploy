@@ -39,23 +39,20 @@ runs:
         terraform_version: ${{ inputs.terraform_version }}
 
     - name: Create Terraform backend config
-      id: create-backend-config
-      uses: actions/github-script@v5
-      with:
-        script: |
-          const fs = require('fs');
-          const path = 'terraform/backend.tf';
-          const content = `
-          terraform {
-            backend "gcs" {
-              bucket = ${inputs.gcs_state_bucket}
-              prefix =  "${inputs.streamlit_name}"
-            }
-          }`;
-
-          fs.mkdirSync('terraform', { recursive: true });
-          fs.writeFileSync(path, content.trim());
-          console.log(`Created ${path} with content:\n${content}`);
+      if: ${{ inputs.gcs_state_bucket != '' }}
+      shell: bash
+      run: |
+        mkdir -p terraform
+        cat <<EOF > ${{ inputs.terraform_directory }}/backend.tf
+        terraform {
+          backend "gcs" {
+            bucket = "${{ inputs.gcs_state_bucket }}"
+            prefix = "${{ inputs.streamlit_name }}"
+          }
+        }
+        EOF
+        
+        cat ${{ inputs.terraform_directory }}/backend.tf
 
     - name: Get Last Successful Run
       if: ${{ inputs.gcs_state_bucket == '' }}
