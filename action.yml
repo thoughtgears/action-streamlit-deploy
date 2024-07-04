@@ -78,6 +78,12 @@ runs:
       with:
         terraform_version: 1.8.5
 
+    - name: Get my tags
+      id: get-tags
+      shell: bash
+      run: |
+        echo ${{ fromJSON(steps.meta.outputs.json) }}
+
     - name: Create Terraform backend config
       shell: bash
       run: |
