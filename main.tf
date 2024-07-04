@@ -11,6 +11,7 @@ locals {
   service_apis = [
     "run.googleapis.com",
     "artifactregistry.googleapis.com",
+    "serviceusage.googleapis.com"
   ]
 }
 
