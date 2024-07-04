@@ -24,7 +24,7 @@ resource "google_artifact_registry_repository" "streamlit" {
 
 resource "google_service_account" "cloud_run_streamlit" {
   project      = var.project_id
-  account_id   = "run-sl-${var.streamlit_name}"
+  account_id   = "run-${var.streamlit_name}"
   display_name = "[Run] Streamlit ${var.streamlit_name}"
 }
 
