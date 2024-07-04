@@ -7,6 +7,14 @@ terraform {
   }
 }
 
+locals {
+  service_apis = [
+    "run.googleapis.com",
+    "artifactregistry.googleapis.com",
+    "firestore.googleapis.com"
+  ]
+}
+
 resource "google_artifact_registry_repository" "streamlit" {
   project       = var.project_id
   location      = var.region
@@ -18,12 +26,6 @@ resource "google_service_account" "cloud_run_streamlit" {
   project      = var.project_id
   account_id   = "run-sl-${var.streamlit_name}"
   display_name = "[Run] Streamlit ${var.streamlit_name}"
-}
-
-resource "google_project_iam_member" "cloud_run_streamlit_database_user" {
-  project = var.project_id
-  member  = "serviceAccount:${google_service_account.cloud_run_streamlit.email}"
-  role    = "roles/datastore.user"
 }
 
 variable "region" {
@@ -43,6 +45,10 @@ variable "streamlit_name" {
   }
 }
 
-output "docker_repository" {
+output "docker_repository_uri" {
   value = "${var.region}-docker.pkg.dev/${var.project_id}/streamlit"
+}
+
+output "service_account_email" {
+  value = google_service_account.cloud_run_streamlit.email
 }

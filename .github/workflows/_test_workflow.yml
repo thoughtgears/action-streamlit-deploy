@@ -4,7 +4,7 @@ on:
       - main
     paths:
       - 'examples/test/**'
-      - '.github/workflows/test.yml'
+      - '.github/workflows/_test_workflow.yml'
       - 'action.yml'
 
 jobs:
@@ -29,9 +29,6 @@ jobs:
       - name: Test Composite Action
         uses: ./
         with:
-          terraform-version: 1.8.2
-          region: europe-west1
           project: ${{ secrets.GCP_PROJECT_ID }}
-          terraform_directory: examples/test
           github_token: ${{ secrets.GITHUB_TOKEN }}
           gcs_state_bucket: action-streamlit-deploy-demo
