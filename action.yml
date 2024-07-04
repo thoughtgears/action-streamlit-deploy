@@ -7,18 +7,27 @@ inputs:
   project:
     description: GCP Project to deploy to
     required: true
-  github_token:
-    description: GitHub token to use in the action for different steps
-    required: true
-  streamlit_name:
-    description: The name of the streamlit app
-    required: true
   docker_repository:
     description: The name of the Docker repository to store the image
     required: true
+
+  streamlit_name:
+    description: The name of the streamlit app
+    required: true
+  streamlit_path:
+    description: The path to the streamlit code and Dockerfile
+    required: true
+
+  github_token:
+    description: GitHub token to use in the action for different steps
+    required: true
+  access_token:
+    description: Access token to use for Docker login
+    required: true
+
   gcs_state_bucket:
     description: The name of the GCS bucket to store the Terraform state
-    default: ""
+    required: true
 
 outputs:
   streamlit_url:
@@ -32,6 +41,37 @@ runs:
   using: composite
 
   steps:
+    - name: Set variables
+      id: set-vars
+      shell: bash
+      run: |
+        echo "DOCKER_REPO=$(echo ${{ inputs.docker_repository }} | cut -d'/' -f1)" >> $GITHUB_ENV
+
+    - name: Docker Metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ inputs.docker_repository }}/${{ inputs.streamlit_name }}
+        tags: |
+          type=sha
+          type=raw,value=latest,enable={{is_default_branch}}
+
+    - name: Docker Login (Google)
+      uses: docker/login-action@v3
+      id: login-gar
+      with:
+        registry: ${{ env.DOCKER_REPO }}
+        username: oauth2accesstoken
+        password: ${{ inputs.access_token }}
+
+    - name: Build and push
+      uses: docker/build-push-action@v5
+      with:
+        context: ${{ inputs.streamlit_path }}
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+
     - name: Setup Terraform
       id: setup-terraform
       uses: hashicorp/setup-terraform@v3
@@ -39,7 +79,6 @@ runs:
         terraform_version: 1.8.5
 
     - name: Create Terraform backend config
-      if: ${{ inputs.gcs_state_bucket != '' }}
       shell: bash
       run: |
         mkdir -p terraform
@@ -69,6 +108,5 @@ runs:
       id: terraform-outputs
       shell: bash
       run: |
-        cat outputs.json
         streamlit_service_account=$(jq -r .streamlit_service_account.value outputs.json)
-        echo "::set-output name=streamlit_service_account::$streamlit_service_account"
+        echo "streamlit_service_account=$streamlit_service_account" >> $GITHUB_OUTPUT

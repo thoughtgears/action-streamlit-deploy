@@ -19,8 +19,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Authenticate with Google Cloud
+        id: auth
         uses: google-github-actions/auth@v2
         with:
+          token_format: access_token
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           service_account: ${{ secrets.WIF_SA }}
           workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
@@ -31,5 +33,7 @@ jobs:
           project: ${{ secrets.GCP_PROJECT_ID }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           streamlit_name: test-streamlit
+          streamlit_path: examples/test
           docker_repository: ${{ secrets.DOCKER_REPOSITORY }}
+          access_token: ${{ ouputs.auth.access_token }}
           gcs_state_bucket: action-streamlit-deploy-demo
