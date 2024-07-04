@@ -34,4 +34,4 @@ jobs:
           project: ${{ secrets.GCP_PROJECT_ID }}
           terraform_directory: examples/test
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          gcs_state_bucket: ${{ secrets.GCS_BUCKET }}
+          gcs_state_bucket: action-streamlit-deploy-demo
