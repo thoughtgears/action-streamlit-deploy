@@ -2,11 +2,10 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'examples/test/**'
-      - '.github/workflows/_test_workflow.yml'
-      - 'action.yml'
-
+    paths-ignore:
+      - 'README.md'
+      - '.env'
+      - 'LICENSE'
 jobs:
   test:
     runs-on: ubuntu-latest
