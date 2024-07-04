@@ -17,6 +17,9 @@ inputs:
   streamlit_path:
     description: The path to the streamlit code and Dockerfile
     required: true
+  public:
+    description: Whether the app should be public or not
+    default: "false"
 
   github_token:
     description: GitHub token to use in the action for different steps
@@ -65,6 +68,7 @@ runs:
         password: ${{ inputs.access_token }}
 
     - name: Build and push
+      id: build
       uses: docker/build-push-action@v5
       with:
         context: ${{ inputs.streamlit_path }}
@@ -77,12 +81,6 @@ runs:
       uses: hashicorp/setup-terraform@v3
       with:
         terraform_version: 1.8.5
-
-    - name: Get my tags
-      id: get-tags
-      shell: bash
-      run: |
-        echo ${{ fromJSON(steps.meta.outputs.json) }}
 
     - name: Create Terraform backend config
       shell: bash
@@ -106,7 +104,10 @@ runs:
         terraform plan -out=tf.plan \
           --var region=${{ inputs.region }} \
           --var project_id=${{ inputs.project }} \
-          --var streamlit_name=${{ inputs.streamlit_name }}
+          --var streamlit_name=${{ inputs.streamlit_name }} \\
+          --var docker_image=${{ inputs.docker_repository }}/${{ inputs.streamlit_name }} \\
+          --var docker_digest=${{ steps.build.outputs.digest }} \\
+          --var public=${{ inputs.public }}
         terraform apply tf.plan
         terraform output -json > outputs.json
 
