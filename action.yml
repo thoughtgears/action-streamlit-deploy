@@ -13,6 +13,9 @@ inputs:
   streamlit_name:
     description: The name of the streamlit app
     required: true
+  docker_repository:
+    description: The name of the Docker repository to store the image
+    required: true
   gcs_state_bucket:
     description: The name of the GCS bucket to store the Terraform state
     default: ""

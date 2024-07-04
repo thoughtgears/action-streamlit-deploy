@@ -10,8 +10,6 @@ terraform {
 locals {
   service_apis = [
     "run.googleapis.com",
-    "artifactregistry.googleapis.com",
-    "serviceusage.googleapis.com"
   ]
 }
 
@@ -19,14 +17,6 @@ resource "google_project_service" "this" {
   for_each = toset(local.service_apis)
   project  = var.project_id
   service  = each.value
-}
-
-resource "google_artifact_registry_repository" "streamlit" {
-  project       = var.project_id
-  location      = var.region
-  format        = "DOCKER"
-  repository_id = "streamlit"
-  depends_on    = [google_project_service.this["artifactregistry.googleapis.com"]]
 }
 
 resource "google_service_account" "cloud_run_streamlit" {
@@ -50,10 +40,6 @@ variable "streamlit_name" {
     condition     = length(var.streamlit_name) <= 24
     error_message = "The streamlit name must be 24 characters or less."
   }
-}
-
-output "docker_repository_uri" {
-  value = "${var.region}-docker.pkg.dev/${var.project_id}/streamlit"
 }
 
 output "service_account_email" {

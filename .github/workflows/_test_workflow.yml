@@ -31,4 +31,5 @@ jobs:
           project: ${{ secrets.GCP_PROJECT_ID }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           streamlit_name: test-streamlit
+          docker_repository: ${{ secrets.DOCKER_REPOSITORY }}
           gcs_state_bucket: action-streamlit-deploy-demo
