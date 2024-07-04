@@ -36,9 +36,6 @@ outputs:
   streamlit_url:
     description: The URL of the deployed Cloud Run streamlit app
     value: ${{ steps.deploy.outputs.streamlit_url }}
-  streamlit_service_account:
-    description: The service account used by the streamlit app
-    value: ${{ steps.deploy.outputs.streamlit_service_account }}
 
 runs:
   using: composite
@@ -122,7 +119,5 @@ runs:
       id: terraform-outputs
       shell: bash
       run: |
-        streamlit_service_account=$(jq -r .streamlit_service_account.value outputs.json)
         streamlit_url=$(jq -r .streamlit_url.value outputs.json)
-        echo "streamlit_service_account=$streamlit_service_account" >> $GITHUB_OUTPUT
         echo "streamlit_url=$streamlit_url" >> $GITHUB_OUTPUT
