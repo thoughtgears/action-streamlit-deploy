@@ -37,3 +37,9 @@ jobs:
           docker_repository: ${{ secrets.DOCKER_REPOSITORY }}
           access_token: ${{ steps.auth.outputs.access_token }}
           gcs_state_bucket: action-streamlit-deploy-demo
+
+      - name: Output URL
+        run: echo ${{ steps.test.outputs.streamlit_url }}
+
+      - name: Output Service Account
+        run: echo ${{ steps.test.outputs.streamlit_service_account }}

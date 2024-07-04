@@ -35,7 +35,7 @@ inputs:
 outputs:
   streamlit_url:
     description: The URL of the deployed Cloud Run streamlit app
-    value: not-set
+    value: ${{ steps.deploy.outputs.streamlit_url }}
   streamlit_service_account:
     description: The service account used by the streamlit app
     value: ${{ steps.deploy.outputs.streamlit_service_account }}
@@ -95,19 +95,26 @@ runs:
         }
         EOF
 
+    - name: Create tfvars
+      id: create-tfvars
+      shell: bash
+      run: |
+        cat <<EOF > terraform.auto.tfvars
+        region = "${{ inputs.region }}"
+        project_id = "${{ inputs.project }}"
+        streamlit_name = "${{ inputs.streamlit_name }}"
+        docker_image = "${{ inputs.docker_repository }}/${{ inputs.streamlit_name }}"
+        docker_digest = "${{ steps.build.outputs.digest }}"
+        public = ${inputs.public}
+        EOF
+
     - name: Terraform Run
       id: terraform-run
       shell: bash
       run: |
         terraform init
         terraform validate
-        terraform plan -out=tf.plan \
-          --var region=${{ inputs.region }} \
-          --var project_id=${{ inputs.project }} \
-          --var streamlit_name=${{ inputs.streamlit_name }} \\
-          --var docker_image=${{ inputs.docker_repository }}/${{ inputs.streamlit_name }} \\
-          --var docker_digest=${{ steps.build.outputs.digest }} \\
-          --var public=${{ inputs.public }}
+        terraform plan -out=tf.plan
         terraform apply tf.plan
         terraform output -json > outputs.json
 
@@ -116,4 +123,6 @@ runs:
       shell: bash
       run: |
         streamlit_service_account=$(jq -r .streamlit_service_account.value outputs.json)
+        streamlit_url=$(jq -r .streamlit_url.value outputs.json)
         echo "streamlit_service_account=$streamlit_service_account" >> $GITHUB_OUTPUT
+        echo "streamlit_url=$streamlit_url" >> $GITHUB_OUTPUT

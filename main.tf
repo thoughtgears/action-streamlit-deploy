@@ -97,3 +97,7 @@ variable "public" {
 output "service_account_email" {
   value = google_service_account.cloud_run_streamlit.email
 }
+
+output "streamlit_url" {
+  value = google_cloud_run_v2_service.streamlit.uri
+}
