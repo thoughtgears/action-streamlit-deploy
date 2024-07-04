@@ -105,7 +105,7 @@ runs:
         streamlit_name = "${{ inputs.streamlit_name }}"
         docker_image = "${{ inputs.docker_repository }}/${{ inputs.streamlit_name }}"
         docker_digest = "${{ steps.build.outputs.digest }}"
-        public = ${inputs.public}
+        public = ${{ inputs.public }}
         EOF
 
     - name: Terraform Run
